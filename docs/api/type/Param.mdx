@@ -9,28 +9,96 @@ hide_title: true
 
 The interface implemented by all route params.
 
-## Generic type variables
+## Properties {#properties}
+
+:::info
+
+All properties are read-only.
+
+:::
+
+### `name` {#property-name}
+
+The name of the param, as a string of type [`Name`][name type].
+
+The `name` property determines which arg gets used for this param when building
+a path string, as well as which property of the result will contain the value
+parsed for this param when matching against a path string.
+
+### `exp` {#property-exp}
+
+A [regular expression] with a [capturing group], used to parse the value for
+this param from a path string.
+
+When successfully matched, the content from the [capturing group] will be passed
+to [`parse`] for parsing.
+
+:::caution
+
+Param expressions must use exactly 1 [capturing group], otherwise errors will be
+thrown when attempting to match against path strings. This limitation helps
+limit complexity in the matching system.
+
+:::
+
+## Methods {#methods}
+
+### `build` {#method-build}
+
+Builds the string representation of this param used when building path strings.
+
+#### Parameters {#method-build-parameters}
+
+`build` should have a single parameter of type [`Arg`], which accepts the
+"value" of the param.
+
+#### Return value {#method-build-return-value}
+
+`build` should return a string representation of this param.
+
+:::tip
+
+The strings produced by `build` should match [`exp`], and the resulting
+[capturing group] content should be parsable with [`parse`].
+
+:::
+
+### `parse` {#method-parse}
+
+Parses a successful match against [`exp`].
+
+#### Parameters {#method-parse-parameters}
+
+`parse` should have a single string parameter, which accepts the
+[capturing group] content of a successful match against [`exp`].
+
+:::tip
+
+`parse` should be capable of parsing *any* [capturing group] content that can
+occur in a successful match of [`exp`] against the strings that are produced by
+[`build`].
+
+:::
+
+#### Return value {#method-parse-return-value}
+
+`parse` should return a value of type [`Result`] which represents the parsed
+"value" of the param.
+
+## Type variables {#type-variables}
 
 The `Param` type is a [generic type]:
 
     Param<Name extends string, Arg = string, Result = Arg>
 
-- `Name` is the param name as a [literal type]
-- `Arg` is the type of the arg that must be supplied for this param when
-  building a path
-- `Result` is the type of the value that will be parsed for this param when
-  matching against a path
+### `Name` {#type-variable-name}
 
-Leaving off the `Result` type variable creates a `Param` type where the `Arg`
-and `Result` types are the same, meaning that the following types are
-equivalent:
+The param [`name`] as a [literal type].
 
-```ts no-transpile
-import {Param} from '@snout/router-path'
+### `Arg` {#type-variable-arg}
 
-type ParamA = Param<'param-name', boolean, boolean>
-type ParamB = Param<'param-name', boolean>
-```
+The type of the arg that must be supplied for this param when building a path
+string.
 
 Leaving off both the `Arg` and `Result` type variables creates a `Param` where
 both the `Arg` and `Result` types are `string`, meaning that the following types
@@ -44,7 +112,59 @@ type ParamB = Param<'param-name', string>
 type ParamC = Param<'param-name'>
 ```
 
+### `Result` {#type-variable-result}
+
+The type of the value that will be parsed for this param when matching against a
+path string.
+
+Leaving off the `Result` type variable creates a `Param` type where the `Arg`
+and `Result` types are the same, meaning that the following types are
+equivalent:
+
+```ts no-transpile
+import {Param} from '@snout/router-path'
+
+type ParamA = Param<'param-name', boolean, boolean>
+type ParamB = Param<'param-name', boolean>
+```
+
+## Usage {#usage}
+
+When writing custom param creators, the `Param` type helps define the types
+that are accepted when building, and parsed when matching:
+
+```ts no-transpile
+import {Param, path} from '@snout/router-path'
+
+/**
+ * A useless example param that takes a boolean when building, and parses an
+ * uppercase string version of a boolean when matching
+ */
+function myParam<Name extends string> (name: Name): Param<Name, boolean, string> {
+  return {
+    name,
+    exp: /(true|false)/,
+    build: arg => String(arg),
+    parse: match => match.toUpperCase(),
+  }
+}
+
+const pathA = path`/a/${myParam('x')}/b`
+pathA.build({x: true})   // returns '/a/true/b'
+pathA.match('/a/true/b') // returns {x: 'TRUE'}
+```
+
 <!-- References -->
 
+[`arg`]: #type-variable-arg
+[`build`]: #method-build
+[`exp`]: #property-exp
+[`name`]: #property-name
+[`parse`]: #method-parse
+[`result`]: #type-variable-result
+[name type]: #type-variable-name
+
+[capturing group]: https://javascript.info/regexp-groups
 [generic type]: https://www.typescriptlang.org/docs/handbook/2/generics.html
 [literal type]: https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#literal-types
+[regular expression]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
