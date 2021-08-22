@@ -16,7 +16,7 @@ export default function Hero () {
       <p className='hero__subtitle'>{tagline}</p>
 
       <div className={styles.buttons}>
-        <Link className='button button--outline button--secondary button--lg' to={useBaseUrl('api/REPLACE_ME')}>
+        <Link className='button button--outline button--secondary button--lg' to={useBaseUrl('api/path')}>
           API reference
         </Link>
       </div>

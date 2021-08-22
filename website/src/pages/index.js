@@ -8,9 +8,9 @@ import Hero from '../components/Hero.js'
 
 export default function Home () {
   const context = useDocusaurusContext()
-  const {siteConfig: {tagline, title} = {}} = context
+  const {siteConfig: {tagline} = {}} = context
 
-  return <Layout title={title} description={tagline}>
+  return <Layout description={tagline}>
     <Hero />
 
     <main>
