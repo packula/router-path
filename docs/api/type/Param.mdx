@@ -27,8 +27,8 @@ parsed for this param when matching against a path string.
 
 ### `exp` {#property-exp}
 
-A [regular expression] with a [capturing group], used to parse the value for
-this param from a path string.
+A [regular expression] with a [capturing group], used to match and extract a
+portion of a path string for subsequent parsing as the value of this param.
 
 When successfully matched, the content from the [capturing group] will be passed
 to [`parse`] for parsing.
@@ -59,7 +59,7 @@ Builds the string representation of this param used when building path strings.
 :::tip
 
 The strings produced by `build` should match [`exp`], and the resulting
-[capturing group] content should be parsable with [`parse`].
+[capturing group] content should be able to be parsed by [`parse`].
 
 :::
 
@@ -149,7 +149,7 @@ function looseParam<Name extends string> (name: Name): Param<Name, any, string> 
 }
 
 const pathA = path`/a/${looseParam('b')}/c`
-pathA.build({b: 'x'})   // returns '/a/x/c'
+pathA.build({b: 'x'}) // returns '/a/x/c'
 pathA.match('/a/y/b') // returns {b: 'y'}
 ```
 

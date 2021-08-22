@@ -7,19 +7,80 @@ hide_title: true
 
 # `param`
 
-REPLACE_ME
+A param creator that creates simple params which accept a string when building,
+and produce a string when matching.
 
-## Parameters
-
-REPLACE_ME
-
-## Return value
-
-REPLACE_ME
-
-## Usage
-
-```ts
+```ts no-transpile
+function param (name: string, exp?: RegExp): Param
 ```
 
+## Parameters {#parameters}
+
+### `name` {#parameter-name}
+
+The name of the param to create.
+
+Determines which arg gets used for the param when building a path string, as
+well as which property of the result will contain the value parsed for the param
+when matching against a path string.
+
+### `exp` {#parameter-exp}
+
+An **optional** [regular expression] with a [capturing group], used to match and
+extract a portion of a path string.
+
+When successfully matched, the content from the [capturing group] will become
+the "value" of this param in the result.
+
+:::caution
+
+If specified, `exp` **must** use exactly 1 [capturing group], otherwise errors
+will be thrown when attempting to match against path strings. This limitation
+helps limit complexity in the matching system.
+
+:::
+
+When `exp` is not specified, a default expression will be used that consumes
+everything until the next `/` character.
+
+## Return value {#return-value}
+
+`param` will return a [`Param`] with the specified `name` and `exp`.
+
+## Usage {#usage}
+
+```js
+import {param, path} from '@snout/router-path'
+
+const id = param('id')
+const lang = param('lang', /([a-z]{2}-[A-Z]{2})/)
+
+const pathA = path`/page/${lang}/${id}`
+pathA.match('/page/en-US/111') // returns {lang: 'en-US', id: '111'}
+pathA.match('/page/ko-KR/222') // returns {lang: 'ko-KR', id: '222'}
+```
+
+:::tip
+
+Unless a custom [`exp`] is being specified, it's usually preferable to specify
+params as strings. For example, these two paths are equivalent:
+
+```js
+import {param, path} from '@snout/router-path'
+
+const pathA = path`/user/${'id'}`
+const pathB = path`/user/${param('id')}`
+
+pathA.match('/user/111') // returns {id: '111'}
+pathB.match('/user/111') // returns {id: '111'}
+```
+
+:::
+
 <!-- References -->
+
+[`exp`]: #parameter-exp
+[`param`]: type/Param.mdx
+
+[capturing group]: https://javascript.info/regexp-groups
+[regular expression]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
