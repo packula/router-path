@@ -137,21 +137,20 @@ that are accepted when building, and parsed when matching:
 import {Param, path} from '@snout/router-path'
 
 /**
- * A useless example param that takes a boolean when building, and parses an
- * uppercase string version of a boolean when matching
+ * Creates a param that takes any type of arg, but only produces a string
  */
-function myParam<Name extends string> (name: Name): Param<Name, boolean, string> {
+function looseParam<Name extends string> (name: Name): Param<Name, any, string> {
   return {
     name,
-    exp: /(true|false)/,
+    exp: /([^/]+)/,
     build: arg => String(arg),
-    parse: match => match.toUpperCase(),
+    parse: match => match,
   }
 }
 
-const pathA = path`/a/${myParam('x')}/b`
-pathA.build({x: true})   // returns '/a/true/b'
-pathA.match('/a/true/b') // returns {x: 'TRUE'}
+const pathA = path`/a/${looseParam('b')}/c`
+pathA.build({b: 'x'})   // returns '/a/x/c'
+pathA.match('/a/y/b') // returns {b: 'y'}
 ```
 
 <!-- References -->
