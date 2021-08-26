@@ -14,7 +14,7 @@ consume a single path segment, and produce strings. If you need more complicated
 behavior, you can either bring in an additional dependency like
 [`@snout/router-path-extras`], or you can implement [`Param`] yourself.
 
-## Type safety
+## Type safety {#type-safety}
 
 One of the most powerful features of **Snout Router Path** is its type safety.
 Basically, this means that TypeScript "knows" what parameters exist, as well as
@@ -37,17 +37,17 @@ function int<Name extends string> (name: Name): Param<Name, number> {
   }
 }
 
-const userPath = path`/user/${int('id')}`
+const user = path`/user/${int('id')}`
 
 // TypeScript "knows" that we need a number when building:
 
-userPath.build({id: 111})   // no error
-userPath.build({id: '111'}) // type error
-userPath.build({})          // type error
+user.build({id: 111})   // no error
+user.build({id: '111'}) // type error
+user.build({})          // type error
 
 // TypeScript "knows" that a successful match will contain a number:
 
-const match = userPath.match('/user/111')
+const match = user.match('/user/111')
 
 if (match) {
   console.log(match.id.toExponential()) // no error
@@ -63,12 +63,12 @@ the [`Param`], as well as specifying `number` as the [`Arg`] type. Since we've
 left off the third type variable ([`Result`]), this defaults to the same as the
 [`Arg`] type.
 
-In some cases, you may wish to have parameters that accept different types of
+In some cases, you may wish to have parameters that consume different types of
 values to what they produce. This is when specifying the [`Result`] type
 variable is necessary.
 
 For example, it's possible to make the integer parameters from the above example
-accept numbers *or* strings, whilst continuing to always produce a number. All
+consume numbers *or* strings, whilst continuing to always produce a number. All
 we need to do is specify an [`Arg`] as `number | string` and [`Result`] as
 `number`:
 
@@ -84,18 +84,18 @@ function looseInt<Name extends string> (name: Name): Param<Name, number | string
   }
 }
 
-const userPath = path`/user/${looseInt('id')}`
+const user = path`/user/${looseInt('id')}`
 
 // TypeScript "knows" that we need a number or string when building:
 
-userPath.build({id: 111})   // no error
-userPath.build({id: '111'}) // no error
-userPath.build({id: null})  // type error
-userPath.build({})          // type error
+user.build({id: 111})   // no error
+user.build({id: '111'}) // no error
+user.build({id: null})  // type error
+user.build({})          // type error
 
 // TypeScript still "knows" that a successful match will contain a number:
 
-const match = userPath.match('/user/111')
+const match = user.match('/user/111')
 
 if (match) {
   console.log(match.id.toExponential()) // no error
@@ -106,29 +106,150 @@ if (match) {
 
 ## Properties {#properties}
 
-:::info
-
-All properties are read-only.
-
-:::
-
 ### `name` {#property-name}
 
-The name of the parameter, as a string of type [`Name`][name type].
+The name of the parameter.
+
+```ts no-transpile
+readonly name: Name
+```
+
+In order to support the [type safety] features of **Snout Router Path**, it's
+important that this property uses a `string` [literal type]. The best way to
+ensure this is to use a [generic] function to create parameters:
+
+```ts no-transpile
+import {Param, path} from '@snout/router-path'
+
+function customParam<Name extends string> (name: Name): Param<Name> {
+  return {
+    name,
+    exp: /([^/]+)/,
+    format: arg => arg,
+    parse: match => match,
+  }
+}
+
+const category = customParam('category')
+const id = customParam('id')
+
+const article = path`/article/${category}/${id}`
+```
+
+It's also possible to define one-off parameters in various ways using TypeScript
+syntax:
+
+```ts no-transpile
+import {Param, path} from '@snout/router-path'
+
+// explicit
+const category: Param<'category'> = {
+  name: 'category',
+  exp: /([^/]+)/,
+  format: arg => arg,
+  parse: match => match,
+}
+
+// implicit
+const id = {
+  name: 'id' as 'id',
+  exp: /([^/]+)/,
+  format: (arg: string) => arg,
+  parse: (match: string) => match,
+}
+
+const article = path`/article/${category}/${id}`
+```
 
 ### `exp` {#property-exp}
 
-A [regular expression] with a [capturing group], used to determine which part of
-a path becomes the argument for this parameter.
+The [regular expression] used to determine whether a segment (or segments) of a
+path match this parameter.
 
-When successfully matched, the content from the [capturing group] will be passed
-to [`parse`] for parsing.
+```ts no-transpile
+readonly exp: RegExp
+```
 
-:::caution
+Route parameters use [`exp`] to determine whether a segment of a path matches
+the parameter:
 
-`exp` **must** have exactly 1 [capturing group], otherwise errors will be thrown
-when attempting to match against paths. This limitation helps limit complexity
-in the matching system.
+```ts
+import {Param, path} from '@snout/router-path'
+
+function int<Name extends string> (name: Name): Param<Name, number> {
+  return {
+    name,
+    exp: /(0|[1-9]\d*)/,
+    format: arg => `${Math.floor(arg)}`,
+    parse: match => parseInt(match, 10),
+  }
+}
+
+const user = path`/user/${int('id')}`
+
+console.log(user.test('/user/111')) // outputs "true"
+console.log(user.test('/user/abc')) // outputs "false"
+console.log(user.test('/user/011')) // outputs "false"
+```
+
+Route parameters also use [`exp`] to determine how much of a path they consume.
+There is nothing in the matching system that dictates that *all* parameters must
+stop at the next `/` character. This behavior comes from [`exp`].
+
+For example, it's possible to use a different separator entirely, such as `.`:
+
+```ts
+import {Param, path} from '@snout/router-path'
+
+function dotted<Name extends string> (name: Name): Param<Name> {
+  return {
+    name,
+    exp: /([^.]+)/,
+    format: arg => arg,
+    parse: match => match,
+  }
+}
+
+const roles = path`user.${dotted('username')}.roles`
+
+console.log(roles.match('user.piglet.roles')) // outputs {username: 'piglet'}
+console.log(roles.match('user.snouty.roles')) // outputs {username: 'snouty'}
+```
+
+:::note
+
+"Stopping at the next `/` character" *is* the default behavior of the parameters
+that come out of the box with **Snout Router Path**. For reference, the [`exp`]
+used by these parameters is `/([^/]+)/`.
+
+:::
+
+It's also possible to consume multiple "segments" of a path by using [`exp`]:
+
+```ts
+import {Param, path} from '@snout/router-path'
+
+function anything<Name extends string> (name: Name): Param<Name> {
+  return {
+    name,
+    exp: /(.+)/,
+    format: arg => arg,
+    parse: match => match,
+  }
+}
+
+const article = path`/article/${anything('etc')}`
+
+console.log(article.match('/article/10 biggest snouts')) // outputs {etc: '10 biggest snouts'}
+console.log(article.match('/article/sci-fi/space-pigs')) // outputs {etc: 'sci-fi/space-pigs'}
+```
+
+:::danger
+
+Implementing parameters that consume multiple path segments can get complicated
+very quickly. If you really need this kind of behavior, perhaps try using query
+string parameters instead of route parameters, or check out the
+[`@snout/router-path-extras`] package to see what it offers.
 
 :::
 
@@ -188,11 +309,19 @@ The [`Param`] type is a [generic] type:
 
 ### `Name` {#type-variable-name}
 
-The parameter's [`name`] as a [literal type].
+The parameter's [`name`] as a `string` [literal type].
+
+:::info See also
+
+- The [`name`] property
+- [Type safety]
+
+:::
 
 ### `Arg` {#type-variable-arg}
 
-The type of value that must be supplied for this parameter when building a path.
+The type of value that the parameter consumes when building a path. In other
+words, the type of arguments passed to [`format`].
 
 Leaving off both the [`Arg`] and [`Result`] type variables creates a [`Param`]
 where both the [`Arg`] and [`Result`] types are `string`, meaning that the
@@ -206,9 +335,17 @@ type ParamB = Param<'param-name', string>
 type ParamC = Param<'param-name'>
 ```
 
+:::info See also
+
+- The [`format`] method
+- [Type safety]
+
+:::
+
 ### `Result` {#type-variable-result}
 
-The type of value that this parameter will parse when matching against a path.
+The type of value that the parameter produces when matching against a path. In
+other words, the type of values returned from [`parse`].
 
 Leaving off the [`Result`] type variable creates a [`Param`] type where the
 [`Arg`] and [`Result`] types are the same, meaning that the following types are
@@ -221,6 +358,13 @@ type ParamA = Param<'param-name', boolean, boolean>
 type ParamB = Param<'param-name', boolean>
 ```
 
+:::info See also
+
+- The [`parse`] method
+- [Type safety]
+
+:::
+
 <!-- References -->
 
 [`arg`]: #type-variable-arg
@@ -231,6 +375,7 @@ type ParamB = Param<'param-name', boolean>
 [`parse`]: #method-parse
 [`result`]: #type-variable-result
 [name type]: #type-variable-name
+[type safety]: #type-safety
 
 [`@snout/router-path-extras`]: /../router-path-extras
 
