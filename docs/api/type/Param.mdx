@@ -5,22 +5,22 @@ sidebar_label: Param
 hide_title: true
 ---
 
-# `Param`
+# `Param` {#param}
 
-The `Param` interface can be used to implement custom route parameter behavior.
+The [`Param`] interface can be used to implement custom route parameter behavior.
 
 Out of the box, **Snout Router Path** only supports very basic parameters that
 consume a single path segment, and produce strings. If you need more complicated
 behavior, you can either bring in an additional dependency like
-[`@snout/router-path-extras`], or you can implement `Param` yourself.
+[`@snout/router-path-extras`], or you can implement [`Param`] yourself.
 
 ## Type safety
 
 One of the most powerful features of **Snout Router Path** is its type safety.
 Basically, this means that TypeScript "knows" what parameters exist, as well as
-what type they are. The `Param` interface is the core of how this works.
+what type they are. The [`Param`] interface is the core of how this works.
 
-For example, the `Param` interface could be used to implement route parameters
+For example, the [`Param`] interface could be used to implement route parameters
 that work with integers instead of strings. When these parameters are used,
 TypeScript will "know" that they require numbers as arguments when building
 paths, and that they produce numbers when matching paths:
@@ -59,7 +59,7 @@ if (match) {
 In this example, we've made a [generic] function with a `Name` type variable.
 This is important, because it's how TypeScript "knows" about the *existence* of
 the parameter being created. We pass this along as the [`Name`][name type] of
-the `Param`, as well as specifying `number` as the [`Arg`] type. Since we've
+the [`Param`], as well as specifying `number` as the [`Arg`] type. Since we've
 left off the third type variable ([`Result`]), this defaults to the same as the
 [`Arg`] type.
 
@@ -178,7 +178,7 @@ The parsed value of the parameter. The value must have a type matching the
 
 ## Type variables {#type-variables}
 
-The `Param` type is a [generic] type:
+The [`Param`] type is a [generic] type:
 
     Param<Name extends string, Arg = string, Result = Arg>
 
@@ -190,9 +190,9 @@ The parameter's [`name`] as a [literal type].
 
 The type of value that must be supplied for this parameter when building a path.
 
-Leaving off both the `Arg` and `Result` type variables creates a `Param` where
-both the `Arg` and `Result` types are `string`, meaning that the following types
-are equivalent:
+Leaving off both the [`Arg`] and [`Result`] type variables creates a [`Param`]
+where both the [`Arg`] and [`Result`] types are `string`, meaning that the
+following types are equivalent:
 
 ```ts no-transpile
 import {Param} from '@snout/router-path'
@@ -206,8 +206,8 @@ type ParamC = Param<'param-name'>
 
 The type of value that this parameter will parse when matching against a path.
 
-Leaving off the `Result` type variable creates a `Param` type where the `Arg`
-and `Result` types are the same, meaning that the following types are
+Leaving off the [`Result`] type variable creates a [`Param`] type where the
+[`Arg`] and [`Result`] types are the same, meaning that the following types are
 equivalent:
 
 ```ts no-transpile
@@ -223,6 +223,7 @@ type ParamB = Param<'param-name', boolean>
 [`exp`]: #property-exp
 [`format`]: #method-format
 [`name`]: #property-name
+[`param`]: #param
 [`parse`]: #method-parse
 [`result`]: #type-variable-result
 [name type]: #type-variable-name

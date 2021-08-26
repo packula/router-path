@@ -4,7 +4,14 @@ module.exports = {
       type: 'category',
       label: 'API reference',
       items: [
-        'api/path',
+        {
+          type: 'category',
+          collapsed: false,
+          label: 'Functions',
+          items: [
+            'api/path',
+          ],
+        },
         {
           type: 'category',
           collapsed: false,
