@@ -22,7 +22,7 @@ module.exports = {
             'api/type/Param',
             'api/type/ParamArg',
             'api/type/ParamOrString',
-            'api/type/Path',
+            'api/type/PathPattern',
           ],
         },
       ],

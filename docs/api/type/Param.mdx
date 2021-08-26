@@ -119,7 +119,7 @@ The name of the parameter, as a string of type [`Name`][name type].
 ### `exp` {#property-exp}
 
 A [regular expression] with a [capturing group], used to determine which part of
-a path string becomes the argument for this parameter.
+a path becomes the argument for this parameter.
 
 When successfully matched, the content from the [capturing group] will be passed
 to [`parse`] for parsing.
@@ -127,8 +127,8 @@ to [`parse`] for parsing.
 :::caution
 
 `exp` **must** have exactly 1 [capturing group], otherwise errors will be thrown
-when attempting to match against path strings. This limitation helps limit
-complexity in the matching system.
+when attempting to match against paths. This limitation helps limit complexity
+in the matching system.
 
 :::
 
@@ -136,7 +136,11 @@ complexity in the matching system.
 
 ### `format` {#method-format}
 
-Format a parameter value for use in a path.
+Format an argument for use in a path.
+
+```ts no-transpile
+function format (arg: Arg): string
+```
 
 #### Parameters {#method-format-parameters}
 
