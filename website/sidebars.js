@@ -10,6 +10,7 @@ module.exports = {
     },
     {
       type: 'category',
+      collapsed: false,
       label: 'API reference',
       items: [
         {

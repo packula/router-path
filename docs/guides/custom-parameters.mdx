@@ -279,7 +279,7 @@ It's common for these two types to be identical for simple parameters, but in
 some cases, you may wish to have different definitions for these types.
 
 For example, it's possible to make the integer-based parameters used as an
-example in the [Matching and Parsing] section take numbers *or* strings when
+example in the [Matching and parsing] section take numbers *or* strings when
 building paths, but continue to return numbers when matching paths. All we need
 to do is specify an [`Arg`] as `number | string` and [`Result`] as `number`:
 
@@ -317,10 +317,12 @@ if (match) {
 
 <!-- References -->
 
+[`arg`]: ../api/type/Param.mdx#type-variable-arg
 [`exp`]: ../api/type/Param.mdx#property-exp
 [`format`]: ../api/type/Param.mdx##method-format
 [`param`]: ../api/type/Param.mdx
 [`parse`]: ../api/type/Param.mdx#property-parse
+[`result`]: ../api/type/Param.mdx#type-variable-result
 [matching and parsing]: #matching-and-parsing
 [name type]: ../api/type/Param.mdx##type-variable-name
 

@@ -7,103 +7,7 @@ hide_title: true
 
 # `Param` {#param}
 
-The [`Param`] interface can be used to implement custom route parameter
-behavior.
-
-Out of the box, **Snout Router Path** only supports very basic parameters that
-consume a single path segment, and produce strings. If you need more complicated
-behavior, you can either bring in an additional dependency like
-[`@snout/router-path-extras`], or you can implement [`Param`] yourself.
-
-## Type safety {#type-safety}
-
-One of the most powerful features of **Snout Router Path** is its type safety.
-Basically, this means that TypeScript "knows" what parameters exist, as well as
-what type they are. The [`Param`] interface is the core of how this works.
-
-For example, the [`Param`] interface could be used to implement route parameters
-that work with integers instead of strings. When these parameters are used,
-TypeScript will "know" that they require numbers as arguments when building
-paths, and that they produce numbers when matching paths:
-
-```ts no-transpile
-import {Param, path} from '@snout/router-path'
-
-function int<Name extends string> (name: Name): Param<Name, number> {
-  return {
-    name,
-    exp: /(0|[1-9]\d*)/,
-    format: arg => `${Math.floor(arg)}`,
-    parse: match => parseInt(match, 10),
-  }
-}
-
-const user = path`/user/${int('id')}`
-
-// TypeScript "knows" that we need a number when building:
-
-user.build({id: 111})   // no error
-user.build({id: '111'}) // type error
-user.build({})          // type error
-
-// TypeScript "knows" that a successful match will contain a number:
-
-const match = user.match('/user/111')
-
-if (match) {
-  console.log(match.id.toExponential()) // no error
-  console.log(match.id.toUpperCase())   // type error
-  console.log(match.nonexistent)        // type error
-}
-```
-
-In this example, we've made a [generic] function with a `Name` type variable.
-This is important, because it's how TypeScript "knows" about the *existence* of
-the parameter being created. We pass this along as the [`Name`][name type] of
-the [`Param`], as well as specifying `number` as the [`Arg`] type. Since we've
-left off the third type variable ([`Result`]), this defaults to the same as the
-[`Arg`] type.
-
-In some cases, you may wish to have parameters that consume different types of
-values to what they produce. This is when specifying the [`Result`] type
-variable is necessary.
-
-For example, it's possible to make the integer parameters from the above example
-consume numbers *or* strings, whilst continuing to always produce a number. All
-we need to do is specify an [`Arg`] as `number | string` and [`Result`] as
-`number`:
-
-```ts no-transpile
-import {Param, path} from '@snout/router-path'
-
-function looseInt<Name extends string> (name: Name): Param<Name, number | string, number> {
-  return {
-    name,
-    exp: /(0|[1-9]\d*)/,
-    format: arg => typeof arg === 'number' ? `${Math.floor(arg)}` : arg,
-    parse: match => parseInt(match, 10),
-  }
-}
-
-const user = path`/user/${looseInt('id')}`
-
-// TypeScript "knows" that we need a number or string when building:
-
-user.build({id: 111})   // no error
-user.build({id: '111'}) // no error
-user.build({id: null})  // type error
-user.build({})          // type error
-
-// TypeScript still "knows" that a successful match will contain a number:
-
-const match = user.match('/user/111')
-
-if (match) {
-  console.log(match.id.toExponential()) // no error
-  console.log(match.id.toUpperCase())   // type error
-  console.log(match.nonexistent)        // type error
-}
-```
+The [`Param`] interface can be used to implement [custom route parameters].
 
 ## Properties {#properties}
 
@@ -115,142 +19,30 @@ The name of the parameter.
 readonly name: Name
 ```
 
-In order to support the [type safety] features of **Snout Router Path**, it's
-important that this property uses a `string` [literal type]. The best way to
-ensure this is to use a [generic] function to create parameters:
+:::info See also
 
-```ts no-transpile
-import {Param, path} from '@snout/router-path'
+- [Type-safe parameter names] in the [Custom parameters] guide
 
-function customParam<Name extends string> (name: Name): Param<Name> {
-  return {
-    name,
-    exp: /([^/]+)/,
-    format: arg => arg,
-    parse: match => match,
-  }
-}
-
-const category = customParam('category')
-const id = customParam('id')
-
-const article = path`/article/${category}/${id}`
-```
-
-It's also possible to define one-off parameters in various ways using TypeScript
-syntax:
-
-```ts no-transpile
-import {Param, path} from '@snout/router-path'
-
-// explicit
-const category: Param<'category'> = {
-  name: 'category',
-  exp: /([^/]+)/,
-  format: arg => arg,
-  parse: match => match,
-}
-
-// implicit
-const id = {
-  name: 'id' as 'id',
-  exp: /([^/]+)/,
-  format: (arg: string) => arg,
-  parse: (match: string) => match,
-}
-
-const article = path`/article/${category}/${id}`
-```
+:::
 
 ### `exp` {#property-exp}
 
 The [regular expression] used to determine whether a segment (or segments) of a
-path match this parameter.
+path match the parameter.
 
 ```ts no-transpile
 readonly exp: RegExp
 ```
 
-Route parameters use [`exp`] to determine whether a segment of a path matches
-the parameter:
+:::caution
 
-```ts
-import {Param, path} from '@snout/router-path'
-
-function int<Name extends string> (name: Name): Param<Name, number> {
-  return {
-    name,
-    exp: /(0|[1-9]\d*)/,
-    format: arg => `${Math.floor(arg)}`,
-    parse: match => parseInt(match, 10),
-  }
-}
-
-const user = path`/user/${int('id')}`
-
-console.log(user.test('/user/111')) // outputs "true"
-console.log(user.test('/user/abc')) // outputs "false"
-console.log(user.test('/user/011')) // outputs "false"
-```
-
-Route parameters also use [`exp`] to determine how much of a path they consume.
-There is nothing in the matching system that dictates that *all* parameters must
-stop at the next `/` character. This behavior comes from [`exp`].
-
-For example, it's possible to use a different separator entirely, such as `.`:
-
-```ts
-import {Param, path} from '@snout/router-path'
-
-function dotted<Name extends string> (name: Name): Param<Name> {
-  return {
-    name,
-    exp: /([^.]+)/,
-    format: arg => arg,
-    parse: match => match,
-  }
-}
-
-const roles = path`user.${dotted('username')}.roles`
-
-console.log(roles.match('user.piglet.roles')) // outputs {username: 'piglet'}
-console.log(roles.match('user.snouty.roles')) // outputs {username: 'snouty'}
-```
-
-:::note
-
-"Stopping at the next `/` character" *is* the default behavior of the parameters
-that come out of the box with **Snout Router Path**. For reference, the [`exp`]
-used by these parameters is `/([^/]+)/`.
+The expression **must** have exactly one [capturing group].
 
 :::
 
-It's also possible to consume multiple "segments" of a path by using [`exp`]:
+:::info See also
 
-```ts
-import {Param, path} from '@snout/router-path'
-
-function anything<Name extends string> (name: Name): Param<Name> {
-  return {
-    name,
-    exp: /(.+)/,
-    format: arg => arg,
-    parse: match => match,
-  }
-}
-
-const article = path`/article/${anything('etc')}`
-
-console.log(article.match('/article/10 biggest snouts')) // outputs {etc: '10 biggest snouts'}
-console.log(article.match('/article/sci-fi/space-pigs')) // outputs {etc: 'sci-fi/space-pigs'}
-```
-
-:::danger
-
-Implementing parameters that consume multiple path segments can get complicated
-very quickly. If you really need this kind of behavior, perhaps try using query
-string parameters instead of route parameters, or check out the
-[`@snout/router-path-extras`] package to see what it offers.
+- [Matching and parsing] in the [Custom parameters] guide
 
 :::
 
@@ -264,6 +56,12 @@ Format an argument for use in a path.
 function format (arg: Arg): string
 ```
 
+:::info See also
+
+- [Formatting] in the [Custom parameters] guide
+
+:::
+
 #### Parameters {#method-format-parameters}
 
 Accepts a single argument - the value to format. The value must have a type
@@ -273,29 +71,31 @@ matching the [`Arg`] type variable.
 
 A formatted string representing the supplied value.
 
-:::tip
-
 The strings produced by `format` should match [`exp`], and the resulting
 [capturing group] content should be able to be parsed by [`parse`].
-
-:::
 
 ### `parse` {#method-parse}
 
 Parse a successful match against [`exp`].
+
+```ts no-transpile
+function parse (match: string): Result
+```
+
+:::info See also
+
+- [Matching and parsing] in the [Custom parameters] guide
+
+:::
 
 #### Parameters {#method-parse-parameters}
 
 Accepts a single argument - the [capturing group] content of a successful match
 against [`exp`].
 
-:::tip
-
 `parse` should be capable of parsing *any* [capturing group] content that can
 occur in a successful match of [`exp`] against the strings that are produced by
 [`format`].
-
-:::
 
 #### Return value {#method-parse-return-value}
 
@@ -308,6 +108,12 @@ The [`Param`] type is a [generic] type:
 
     Param<Name extends string, Arg = string, Result = Arg>
 
+:::info See also
+
+- [Type safety] in the [Custom parameters] guide
+
+:::
+
 ### `Name` {#type-variable-name}
 
 The parameter's [`name`] as a `string` [literal type].
@@ -315,7 +121,7 @@ The parameter's [`name`] as a `string` [literal type].
 :::info See also
 
 - The [`name`] property
-- [Type safety]
+- [Type-safe parameter names] in the [Custom parameters] guide
 
 :::
 
@@ -339,7 +145,7 @@ type ParamC = Param<'param-name'>
 :::info See also
 
 - The [`format`] method
-- [Type safety]
+- [`Arg` and `Result` types] in the [Custom parameters] guide
 
 :::
 
@@ -362,12 +168,13 @@ type ParamB = Param<'param-name', boolean>
 :::info See also
 
 - The [`parse`] method
-- [Type safety]
+- [`Arg` and `Result` types] in the [Custom parameters] guide
 
 :::
 
 <!-- References -->
 
+[`arg` and `result` types]: ../../guides/custom-parameters.mdx#arg-and-result-types
 [`arg`]: #type-variable-arg
 [`exp`]: #property-exp
 [`format`]: #method-format
@@ -375,10 +182,12 @@ type ParamB = Param<'param-name', boolean>
 [`param`]: #param
 [`parse`]: #method-parse
 [`result`]: #type-variable-result
-[name type]: #type-variable-name
-[type safety]: #type-safety
-
-[`@snout/router-path-extras`]: /../router-path-extras
+[custom parameters]: ../../guides/custom-parameters.mdx
+[custom route parameters]: ../../guides/custom-parameters.mdx
+[formatting]: ../../guides/custom-parameters.mdx#formatting
+[matching and parsing]: ../../guides/custom-parameters.mdx#matching-and-parsing
+[type safety]: ../../guides/custom-parameters.mdx#type-safety
+[type-safe parameter names]: ../../guides/custom-parameters.mdx#type-safe-parameter-names
 
 [capturing group]: https://javascript.info/regexp-groups
 [generic]: https://www.typescriptlang.org/docs/handbook/2/generics.html
