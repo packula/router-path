@@ -2,6 +2,14 @@ module.exports = {
   docs: [
     {
       type: 'category',
+      collapsed: false,
+      label: 'Guides',
+      items: [
+        'guides/custom-parameters',
+      ],
+    },
+    {
+      type: 'category',
       label: 'API reference',
       items: [
         {
