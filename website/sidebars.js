@@ -5,6 +5,7 @@ module.exports = {
       collapsed: false,
       label: 'Guides',
       items: [
+        'guides/index',
         'guides/custom-parameters',
       ],
     },
