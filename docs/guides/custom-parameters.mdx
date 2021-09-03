@@ -215,10 +215,10 @@ user.build({})          // type error
 ### Type-safe parameter names {#type-safe-parameter-names}
 
 You may have noticed by reading the examples in this guide, that [`Param`] has a
-[`Name`][name type] type variable for the parameter name instead of using a
-simple `string`. This [literal type] contains the name of the parameter, but in
-a way that TypeScript's type system understands. This is a key part of how
-TypeScript can know about the *existence* of route parameters.
+[`Name`][name type] type variable for the parameter name. This [literal type]
+contains the name of the parameter, but in a way that TypeScript's type system
+understands. This is a key part of how TypeScript can know about the *existence*
+of route parameters.
 
 The best way to ensure that custom parameters have the correct
 [`Name`][name type] type associated with them, is to use a [generic] function to
