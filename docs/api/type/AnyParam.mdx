@@ -5,13 +5,19 @@ sidebar_label: AnyParam
 hide_title: true
 ---
 
-# `AnyParam` {#anyparam}
+# `AnyParam`
 
 A utility type for use when you need to be able to accept any valid [`Param`]
-type:
+type.
 
 ```ts no-transpile
-type AnyParam = Param<string, any>
+import {AnyParam} from '@snout/router-path'
+```
+
+Functionally equivalent to:
+
+```ts no-transpile
+Param<string, any>
 ```
 
 <!-- References -->
