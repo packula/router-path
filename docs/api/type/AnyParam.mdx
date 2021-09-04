@@ -5,6 +5,15 @@ sidebar_label: AnyParam
 hide_title: true
 ---
 
-# `AnyParam`
+# `AnyParam` {#anyparam}
 
-REPLACE_ME
+A utility type for use when you need to be able to accept any valid [`Param`]
+type:
+
+```ts no-transpile
+type AnyParam = Param<string, any>
+```
+
+<!-- References -->
+
+[`param`]: Param.mdx
