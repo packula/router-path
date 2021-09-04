@@ -19,6 +19,7 @@ module.exports = {
           collapsed: false,
           label: 'Functions',
           items: [
+            'api/normalizeParam',
             'api/path',
           ],
         },
