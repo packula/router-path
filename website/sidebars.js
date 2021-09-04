@@ -32,6 +32,7 @@ module.exports = {
             'api/type/NormalizeParam',
             'api/type/Param',
             'api/type/ParamArg',
+            'api/type/ParamName',
             'api/type/ParamOrString',
             'api/type/PathPattern',
           ],
