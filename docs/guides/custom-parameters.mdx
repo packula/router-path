@@ -267,54 +267,6 @@ const id = {
 const article = path`/article/${category}/${id}`
 ```
 
-### `Arg` and `Result` types {#arg-and-result-types}
-
-The [`Param`] interface is a [generic] type. Two of its type variables are
-closely related:
-
-- The [`Arg`] type variable is the type of argument accepted by [`format`].
-- The [`Result`] type variable is the type of value returned by [`parse`].
-
-It's common for these two types to be identical for simple parameters, but in
-some cases, you may wish to have different definitions for these types.
-
-For example, it's possible to make the integer-based parameters used as an
-example in the [Matching and parsing] section take numbers *or* strings when
-building paths, but continue to return numbers when matching paths. All we need
-to do is specify an [`Arg`] as `number | string` and [`Result`] as `number`:
-
-```ts no-transpile
-import {Param, path} from '@snout/router-path'
-
-function looseInt<Name extends string> (name: Name): Param<Name, number | string, number> {
-  return {
-    name,
-    exp: /(0|[1-9]\d*)/,
-    format: arg => typeof arg === 'number' ? `${Math.floor(arg)}` : arg,
-    parse: match => parseInt(match, 10),
-  }
-}
-
-const user = path`/user/${looseInt('id')}`
-
-// TypeScript "knows" that we need a number or string when building:
-
-user.build({id: 111})   // no error
-user.build({id: '111'}) // no error
-user.build({id: null})  // type error
-user.build({})          // type error
-
-// TypeScript still "knows" that a successful match will contain a number:
-
-const match = user.match('/user/111')
-
-if (match) {
-  console.log(match.id.toExponential()) // no error
-  console.log(match.id.toUpperCase())   // type error
-  console.log(match.nonexistent)        // type error
-}
-```
-
 <!-- References -->
 
 [`arg`]: ../api/type/Param.mdx#type-variable-arg
@@ -322,7 +274,6 @@ if (match) {
 [`format`]: ../api/type/Param.mdx##method-format
 [`param`]: ../api/type/Param.mdx
 [`parse`]: ../api/type/Param.mdx#property-parse
-[`result`]: ../api/type/Param.mdx#type-variable-result
 [matching and parsing]: #matching-and-parsing
 [name type]: ../api/type/Param.mdx##type-variable-name
 

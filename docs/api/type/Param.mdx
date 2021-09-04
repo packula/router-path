@@ -79,7 +79,7 @@ The strings produced by `format` should match [`exp`], and the resulting
 Parse a successful match against [`exp`].
 
 ```ts no-transpile
-function parse (match: string): Result
+function parse (match: string): Arg
 ```
 
 :::info See also
@@ -100,13 +100,13 @@ occur in a successful match of [`exp`] against the strings that are produced by
 #### Return value {#method-parse-return-value}
 
 The parsed value of the parameter. The value must have a type matching the
-[`Result`] type variable.
+[`Arg`] type variable.
 
 ## Type variables {#type-variables}
 
 The [`Param`] type is a [generic] type:
 
-    Param<Name extends string, Arg = string, Result = Arg>
+    Param<Name extends string, Arg = string>
 
 :::info See also
 
@@ -126,59 +126,32 @@ The parameter's [`name`] as a `string` [literal type].
 
 ### `Arg` {#type-variable-arg}
 
-The type of value that the parameter consumes when building a path. In other
-words, the type of arguments passed to [`format`].
+The type of argument the parameter accepts.
 
-Leaving off both the [`Arg`] and [`Result`] type variables creates a [`Param`]
-where both the [`Arg`] and [`Result`] types are `string`, meaning that the
-following types are equivalent:
+Leaving off the [`Arg`] type variable creates a [`Param`] where the [`Arg`] type
+is `string`, meaning that the following types are equivalent:
 
 ```ts no-transpile
 import {Param} from '@snout/router-path'
 
-type ParamA = Param<'param-name', string, string>
-type ParamB = Param<'param-name', string>
-type ParamC = Param<'param-name'>
+type ParamB = Param<'param-name'>
+type ParamA = Param<'param-name', string>
 ```
 
 :::info See also
 
-- [`Arg` and `Result` types] in the [Custom parameters] guide
-
-:::
-
-### `Result` {#type-variable-result}
-
-The type of value that the parameter produces when matching against a path. In
-other words, the type of values returned from [`parse`].
-
-Leaving off the [`Result`] type variable creates a [`Param`] type where the
-[`Arg`] and [`Result`] types are the same, meaning that the following types are
-equivalent:
-
-```ts no-transpile
-import {Param} from '@snout/router-path'
-
-type ParamA = Param<'param-name', boolean, boolean>
-type ParamB = Param<'param-name', boolean>
-```
-
-:::info See also
-
-- [`Arg` and `Result` types] in the [Custom parameters] guide
+- [Type safety] in the [Custom parameters] guide
 
 :::
 
 <!-- References -->
 
-[`arg` and `result` types]: ../../guides/custom-parameters.mdx#arg-and-result-types
 [`arg`]: #type-variable-arg
 [`exp`]: #property-exp
 [`format`]: #method-format
 [`name`]: #property-name
 [`param`]: #param
 [`parse`]: #method-parse
-[`result`]: #type-variable-result
 [custom parameters]: ../../guides/custom-parameters.mdx
 [custom route parameters]: ../../guides/custom-parameters.mdx
 [formatting]: ../../guides/custom-parameters.mdx#formatting
