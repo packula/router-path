@@ -55,17 +55,23 @@ with keys matching the names of the [path pattern]'s route parameters. The
 string arguments will be parsed into values of the appropriate type for each
 parameter.
 
+If the path does not match the pattern, `match` will return `undefined`.
+
 ### `test` {#method-test}
 
-REPLACE_ME
+Check if a path matches the pattern.
+
+```ts no-transpile
+function test (path: string): boolean
+```
 
 #### Parameters {#method-test-parameters}
 
-REPLACE_ME
+Accepts a single argument - the path string to match against.
 
 #### Return value {#method-test-return-value}
 
-REPLACE_ME
+A boolean value indicating whether the path matched the pattern or not.
 
 ## Type variables {#type-variables}
 
