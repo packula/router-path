@@ -7,7 +7,7 @@ hide_title: true
 
 # `Param`
 
-The [`Param`] interface can be used to implement [custom route parameters].
+The `Param` interface can be used to implement [custom route parameters].
 
 ## Properties {#properties}
 
@@ -104,7 +104,7 @@ The parsed value of the parameter. The value must have a type matching the
 
 ## Type variables {#type-variables}
 
-The [`Param`] type is a [generic] type:
+The `Param` type is a [generic] type:
 
     Param<Name extends string, Arg = string>
 
@@ -128,7 +128,7 @@ The parameter's [`name`] as a `string` [literal type].
 
 The type of argument the parameter accepts.
 
-Leaving off the [`Arg`] type variable creates a [`Param`] where the [`Arg`] type
+Leaving off the [`Arg`] type variable creates a `Param` where the [`Arg`] type
 is `string`, meaning that the following types are equivalent:
 
 ```ts no-transpile
@@ -150,7 +150,6 @@ type ParamA = Param<'param-name', string>
 [`exp`]: #property-exp
 [`format`]: #method-format
 [`name`]: #property-name
-[`param`]: #param
 [`parse`]: #method-parse
 [custom parameters]: ../../guides/custom-parameters.mdx
 [custom route parameters]: ../../guides/custom-parameters.mdx
