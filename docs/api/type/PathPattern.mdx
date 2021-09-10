@@ -81,7 +81,23 @@ The `PathPattern` type is a [generic] type:
 
 ### `Params` {#type-variable-params}
 
-REPLACE_ME
+The type of parameters contained in the [path pattern].
+
+Typically, you would not need to manually specify this type variable, as the
+parameter types are automatically inferred when calling the [`path`] function to
+create path patterns:
+
+```ts no-transpile
+import {path} from '@snout/router-path'
+
+const user = path`/user/${'id'}` // user has a type of PathPattern<[Param<'id', string>]>
+```
+
+:::tip Try me!
+
+[Try this example in the TypeScript Playground](https://www.typescriptlang.org/play?#code/JYWwDg9gTgLgBAbzAQxgCwL5wGZQiOAcgAEBnAOwgFcYB6PGgUygFoV1CAoTgYwnNLwqpZnAC8cdmgAGtYc1oASBIWAATQhmlxatOPKhw0yUnGRwYATzCM4EbHAAKqNM5gxm5ADwBtZ1GQQL1UNABo4QShgcgBzAD4AXTigA)
+
+:::
 
 <!-- References -->
 
