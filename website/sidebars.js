@@ -6,6 +6,7 @@ module.exports = {
       label: 'Guides',
       items: [
         'guides/index',
+        'guides/getting-started',
         'guides/path-patterns',
         'guides/custom-parameters',
       ],
