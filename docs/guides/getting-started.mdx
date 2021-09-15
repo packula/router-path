@@ -4,11 +4,38 @@ title: Getting started
 sidebar_label: Getting started
 ---
 
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
 REPLACE_ME
 
 ## Step 1: Installation
 
-REPLACE_ME
+<Tabs
+  groupId="package-managers"
+  defaultValue="npm"
+  values={[
+    {label: 'npm', value: 'npm'},
+    {label: 'Yarn', value: 'yarn'},
+    {label: 'pnpm', value: 'pnpm'},
+  ]}
+>
+<TabItem value="npm">
+
+    npm install @snout/router-path
+
+</TabItem>
+<TabItem value="yarn">
+
+    yarn add @snout/router-path
+
+</TabItem>
+<TabItem value="pnpm">
+
+    pnpm add @snout/router-path
+
+</TabItem>
+</Tabs>
 
 ## Step 2: Create a path pattern
 
