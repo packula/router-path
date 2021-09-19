@@ -1,0 +1,7 @@
+.sandbox {
+  overflow: hidden;
+  width: 100%;
+  border: 0;
+  border-radius: var(--ifm-global-radius);
+  margin-bottom: var(--ifm-leading);
+}
