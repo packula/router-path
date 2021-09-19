@@ -20,5 +20,5 @@ export default function Sandbox (props) {
   if (hideDevTools) src.searchParams.append('hidedevtools', '1')
   if (previewWindow) src.searchParams.append('previewwindow', previewWindow)
 
-  return <iframe className={styles.sandbox} style={{height}} sandbox={sandboxProp} src={src.toString()}></iframe>
+  return <iframe className={styles.sandbox} style={{height}} sandbox={sandboxProp} src={src.toString()} />
 }
