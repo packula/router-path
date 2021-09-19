@@ -6,11 +6,11 @@ const sandboxProp = 'allow-forms allow-modals allow-popups allow-presentation al
 
 export default function Sandbox (props) {
   const {
-    codeMirror,
+    codeMirror = true,
     height,
-    hideDevTools,
+    hideDevTools = true,
     id,
-    previewWindow,
+    previewWindow = 'console',
   } = props
 
   const src = new URL('https://codesandbox.io/')
