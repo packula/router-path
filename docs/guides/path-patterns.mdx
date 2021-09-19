@@ -4,9 +4,67 @@ title: Path patterns
 sidebar_label: Path patterns
 ---
 
-REPLACE_ME
+A *path pattern* is a way to express the structure that a *path* must take in
+order to identify a particular resource, endpoint, or portion of your
+application. Path patterns are what **Snout Router Path** is all about!
+
+In this guide, we'll cover:
+
+- How to create your own path patterns using the [`path`] function
+- Utilizing parameters in your patterns to implement dynamic path segments
+- Determining whether a path matches your pattern
+- Turning a path that matches your pattern into a set of arguments that your
+  application understands
+- How to take a set of arguments, and turn them back into a path that matches
+  your pattern
 
 ## Creating patterns
+
+To create a path pattern, call the [`path`] function by using it in a [tagged
+template literal]:
+
+```ts no-transpile
+import {path} from '@snout/router-path'
+
+const user = path`/user/${'id'}`
+```
+
+The definition of the path pattern is enclosed in backtick characters (`` ` ``).
+Any *substitutions* (e.g. `${'id'}`) become the path pattern's parameters. The
+surrounding text segments are interpreted literally, and become the static parts
+of the path pattern. These text segments can be used on either side of a
+substitution, effectively forming static prefixes and suffixes:
+
+```ts no-transpile
+// The /group/ text segment becomes a static prefix
+// The ${'slug'} substitution becomes a parameter named 'slug'
+// The /members text segment becomes a static suffix
+const groupMembers = path`/group/${'slug'}/members`
+```
+
+:::info Why tagged templates?
+
+If you're not used to the [tagged template literal] syntax, don't worry. Tagged
+templates *are* a lesser-known JavaScript language feature, but they've been
+[supported by all modern browsers] for some time now. They're really just a
+fancy way to call a function.
+
+**Snout Router Path** uses tagged template literals because it means there's no
+need to invent a special syntax for defining path patterns. The *JavaScript
+language itself* already does the work of parsing your path pattern into
+parameters and literal text segments.
+
+:::
+
+### Patterns with multiple parameters
+
+REPLACE_ME
+
+### Patterns with no parameters
+
+REPLACE_ME
+
+### Custom parameters
 
 REPLACE_ME
 
@@ -17,3 +75,10 @@ REPLACE_ME
 ## Building paths
 
 REPLACE_ME
+
+<!-- References -->
+
+[`path`]: ../api/path.mdx
+
+[tagged template literal]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Template_literals#tagged_templates
+[supported by all modern browsers]: https://caniuse.com/template-literals
