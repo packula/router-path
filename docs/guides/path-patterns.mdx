@@ -18,7 +18,7 @@ In this guide, we'll cover:
 - How to take a set of arguments, and turn them back into a path that matches
   your pattern
 
-## Creating patterns
+## Creating patterns {#creating-patterns}
 
 To create a path pattern, call the [`path`] function by using it in a [tagged
 template literal]:
@@ -26,6 +26,7 @@ template literal]:
 ```ts no-transpile
 import {path} from '@snout/router-path'
 
+// This pattern would suit paths like /user/111 or /user/some-string-id
 const user = path`/user/${'id'}`
 ```
 
@@ -36,11 +37,15 @@ of the path pattern. These text segments can be used on either side of a
 substitution, effectively forming static prefixes and suffixes:
 
 ```ts no-transpile
-// The /group/ text segment becomes a static prefix
-// The ${'slug'} substitution becomes a parameter named 'slug'
-// The /members text segment becomes a static suffix
+// This pattern would suit paths like /group/snout/members or /group/P19/members
 const groupMembers = path`/group/${'slug'}/members`
 ```
+
+In the previous `groupMembers` example pattern:
+
+- The `/group/` text segment becomes a static prefix
+- The `${'slug'}` substitution becomes a parameter named 'slug'
+- The `/members` text segment becomes a static suffix
 
 :::info Why tagged templates?
 
@@ -56,29 +61,88 @@ parameters and literal text segments.
 
 :::
 
-### Patterns with multiple parameters
+### Parameters {#parameters}
+
+So far, the parameters we've shown have been created using substitutions with
+strings. For example, when you define the following `imagesByCategory` example
+pattern, you also create a simple parameter named `category`:
+
+```ts no-transpile
+const imagesByCategory = path`/images/${'category'}`
+```
+
+We'll go into more detail about exactly how these simple parameters behave in
+the sections on [matching paths] and [building paths], but for now all you need
+to know is that using a string is a short-hand method for creating a simple
+parameter, with the string becoming the *name* of the new parameter.
+
+In order to keep **Snout Router Path** light and easy to maintain, only these
+simple parameters are included out of the box. In most cases, they should be all
+you need. However, **Snout Router Path** does include a powerful system for
+implementing [custom parameters]. You can implement parameters that utilize
+other data types, other path separators, optional parameters, repeating
+parameters, and just about any kind of parameter you can imagine.
+
+There's also a separate [`@snout/router-path-extras`] package, which has some
+commonly desired parameter type implementations. When you use [custom parameter]
+implementations like the ones in this package, you typically need to call a
+separate function to create the parameters:
+
+```ts no-transpile
+import {path} from '@snout/router-path'
+import {some} from '@snout/router-path-extras'
+
+// This pattern would suit paths like /tagged/snout or /tagged/squishy/pigs
+const tagged = path`/tagged/${some('tags')}`
+```
+
+In the previous `tagged` example pattern, we're using a custom parameter
+implementation called `some`, which is based on an array containing one or more
+strings. Note that instead of a string substitution like `${'id'}`, we're using
+a function call - `${some('tags')}`. We're still setting the parameter name with
+a string, but this time it's an argument to the `some` parameter creator
+function.
+
+:::tip
+
+There's no strict requirement for parameters to be created inline. For example,
+this is an alternate way to define the previous `tagged` example pattern:
+
+```ts no-transpile
+const tagsParam = some('tags')
+const tagged = path`/tagged/${tagsParam}`
+```
+
+:::
+
+### Patterns with multiple parameters {#patterns-with-multiple-parameters}
 
 REPLACE_ME
 
-### Patterns with no parameters
+### Patterns with no parameters {#patterns-with-no-parameters}
 
 REPLACE_ME
 
-### Custom parameters
+### Custom parameters {#custom-parameters}
 
 REPLACE_ME
 
-## Matching paths
+## Matching paths {#matching-paths}
 
 REPLACE_ME
 
-## Building paths
+## Building paths {#building-paths}
 
 REPLACE_ME
 
 <!-- References -->
 
 [`path`]: ../api/path.mdx
+[building paths]: #building-paths
+[custom parameter]: custom-parameters.mdx
+[custom parameters]: custom-parameters.mdx
+[matching paths]: #matching-paths
 
-[tagged template literal]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Template_literals#tagged_templates
+[`@snout/router-path-extras`]: https://snout.dev/router-path-extras
 [supported by all modern browsers]: https://caniuse.com/template-literals
+[tagged template literal]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Template_literals#tagged_templates
