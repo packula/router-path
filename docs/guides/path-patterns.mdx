@@ -117,15 +117,35 @@ const tagged = path`/tagged/${tagsParam}`
 
 ### Patterns with multiple parameters {#patterns-with-multiple-parameters}
 
-REPLACE_ME
+You can create path patterns with multiple parameters by using multiple
+substitutions:
+
+```ts no-transpile
+import {path} from '@snout/router-path'
+
+// This pattern would suit paths like /v1/guides/getting-started or /latest/guides/installation
+const guide = path`/${'version'}/guides/${'name'}`
+```
+
+:::caution
+
+When you specify multiple parameters in a path pattern, you should make sure
+that parameters don't share names. This could result in undefined behavior.
+
+:::
 
 ### Patterns with no parameters {#patterns-with-no-parameters}
 
-REPLACE_ME
+You can create a path patterns with no parameters by using no substitutions. But
+you still need to call the [`path`] function using [tagged template literal]
+syntax:
 
-### Custom parameters {#custom-parameters}
+```ts no-transpile
+import {path} from '@snout/router-path'
 
-REPLACE_ME
+// This pattern would suit the path /pages/faq only
+const guide = path`/pages/faq`
+```
 
 ## Matching paths {#matching-paths}
 
